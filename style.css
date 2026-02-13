@@ -1,0 +1,292 @@
+/* KodNest Premium Build System */
+
+:root {
+  /* Colors */
+  --bg-color: #F7F6F3;
+  --text-primary: #111111;
+  --accent-color: #8B0000;
+  --success-color: #2E7D32; /* Muted green */
+  --warning-color: #D84315; /* Muted amber/orange */
+  --border-color: #E0E0E0;
+  --white: #FFFFFF;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Spacing */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+
+  /* Transitions */
+  --transition-speed: 200ms;
+  --transition-ease: ease-in-out;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+}
+
+p {
+  max-width: 720px;
+  margin-bottom: var(--space-md);
+}
+
+/* Global Layout Structure */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 1. Top Bar */
+.top-bar {
+  height: 64px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand-name {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.step-indicator {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.status-badge {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: #E0E0E0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.in-progress {
+  background: #E3F2FD;
+  color: #0D47A1;
+}
+
+/* 2. Context Header */
+.context-header {
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.context-header h1 {
+  font-size: 32px;
+  margin-bottom: var(--space-xs);
+}
+
+.context-subtext {
+  font-size: 18px;
+  opacity: 0.8;
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+/* Main Workspace Area */
+.main-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* Prevent full body scroll, handle inside components */
+  border-top: 1px solid var(--border-color);
+}
+
+/* 3. Primary Workspace (70%) */
+.primary-panel {
+  flex: 7;
+  padding: var(--space-lg);
+  overflow-y: auto;
+  background: var(--white);
+  border-right: 1px solid var(--border-color);
+}
+
+/* 4. Secondary Panel (30%) */
+.secondary-panel {
+  flex: 3;
+  padding: var(--space-md);
+  background: #FDFDFD;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.secondary-card {
+  background: var(--bg-color);
+  padding: var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.prompt-box {
+  background: var(--white);
+  padding: var(--space-sm);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #333;
+  white-space: pre-wrap;
+  margin-bottom: var(--space-sm);
+}
+
+/* 5. Proof Footer */
+.proof-footer {
+  height: 80px;
+  background: var(--white);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+}
+
+.proof-checklist {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+  accent-color: var(--accent-color);
+  width: 16px;
+  height: 16px;
+}
+
+/* Component: Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-ease);
+  letter-spacing: 0.02em;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--white);
+  border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+  background-color: #6d0000;
+  border-color: #6d0000;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Component: Inputs */
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--white);
+  transition: border-color var(--transition-speed) var(--transition-ease);
+  font-family: var(--font-sans);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Component: Cards */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.card h3 {
+  margin-top: 0;
+  font-size: 18px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+/* Utility */
+.text-muted {
+  color: #666;
+}
+
+.hidden {
+  display: none;
+}

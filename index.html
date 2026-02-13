@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Notification Tracker - KodNest Build</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 1. Top Bar -->
+        <header class="top-bar">
+            <div class="brand-name">Job Notification Tracker</div>
+            <div class="step-indicator">Step 1 / 9</div>
+            <div class="status-badge in-progress">In Progress</div>
+        </header>
+
+        <!-- 2. Context Header -->
+        <section class="context-header">
+            <h1>Design System Setup</h1>
+            <p class="context-subtext">Establishing the visual foundation and interaction rules.</p>
+        </section>
+
+        <!-- Main Workspace Area -->
+        <main class="main-workspace">
+            
+            <!-- 3. Primary Workspace (70%) -->
+            <section class="primary-panel">
+                <div class="card">
+                    <h3>Typography & Colors</h3>
+                    <p>This is the standard body text. It is set in Inter, 16px with 1.6 line-height. It is designed to be calm and legible.</p>
+                    
+                    <div style="margin-top: 24px;">
+                        <span style="display:inline-block; width: 40px; height: 40px; background: #F7F6F3; border: 1px solid #ddd;" title="#F7F6F3 Background"></span>
+                        <span style="display:inline-block; width: 40px; height: 40px; background: #111111;" title="#111111 Text"></span>
+                        <span style="display:inline-block; width: 40px; height: 40px; background: #8B0000;" title="#8B0000 Accent"></span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Buttons & Inputs</h3>
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center;">
+                        <button class="btn btn-primary">Primary Action</button>
+                        <button class="btn btn-secondary">Secondary Action</button>
+                        <button class="btn btn-secondary btn-sm">Small Button</button>
+                    </div>
+
+                    <div style="max-width: 400px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Example Input</label>
+                        <input type="text" placeholder="Type something calm..." />
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Layout Verification</h3>
+                    <p>The layout follows the 4-part structure: Top Bar, Context Header, Primary Workspace, and Secondary Panel.</p>
+                </div>
+            </section>
+
+            <!-- 4. Secondary Panel (30%) -->
+            <aside class="secondary-panel">
+                <div class="secondary-card">
+                    <h4 style="font-family: var(--font-serif); margin-bottom: 12px;">Step Instructions</h4>
+                    <p style="font-size: 14px; margin-bottom: 16px;">Implement the KodNest Premium Build System design philosophy. Ensure all spacing is consistent and colors match the spec.</p>
+                    
+                    <div class="prompt-box">// Verify colors
+// Verify typography
+// Verify spacing</div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="btn btn-secondary btn-sm">Copy</button>
+                        <button class="btn btn-secondary btn-sm">Build in Lovable</button>
+                    </div>
+                </div>
+
+                <div class="secondary-card" style="border-left: 3px solid var(--accent-color);">
+                     <h4 style="font-family: var(--font-serif); margin-bottom: 8px;">Notes</h4>
+                     <p style="font-size: 14px; color: #555;">No gradients, no glassmorphism. Keep it calm.</p>
+                </div>
+            </aside>
+
+        </main>
+
+        <!-- 5. Proof Footer -->
+        <footer class="proof-footer">
+            <div class="proof-checklist">
+                <label class="checkbox-item"><input type="checkbox" checked> UI Built</label>
+                <label class="checkbox-item"><input type="checkbox"> Logic Working</label>
+                <label class="checkbox-item"><input type="checkbox"> Test Passed</label>
+                <label class="checkbox-item"><input type="checkbox"> Deployed</label>
+            </div>
+            
+            <div>
+                 <button class="btn btn-primary">Next Step &rarr;</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
