@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'saved': document.getElementById('view-saved'),
         'digest': document.getElementById('view-digest'),
         'settings': document.getElementById('view-settings'),
-        'proof': document.getElementById('view-proof')
+        'proof': document.getElementById('view-proof'),
+        '404': document.getElementById('view-404')
     };
 
     const navItems = document.querySelectorAll('.nav-item');
@@ -15,7 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function router() {
         // Get current hash or default to 'dashboard'
         const hash = window.location.hash.slice(1) || 'dashboard';
-        const activeRoute = views[hash] ? hash : 'dashboard';
+
+        // Determine active route
+        let activeRoute = '404';
+        if (views[hash]) {
+            activeRoute = hash;
+        } else if (hash === '') {
+            activeRoute = 'dashboard';
+        }
 
         // 1. Update Views
         Object.values(views).forEach(view => {
