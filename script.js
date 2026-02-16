@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Router Logic ---
     const views = {
+        'home': document.getElementById('view-home'),
         'dashboard': document.getElementById('view-dashboard'),
         'saved': document.getElementById('view-saved'),
         'digest': document.getElementById('view-digest'),
@@ -12,17 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const navItems = document.querySelectorAll('.nav-item');
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    const appContainer = document.querySelector('.app-container');
 
     function router() {
-        // Get current hash or default to 'dashboard'
-        const hash = window.location.hash.slice(1) || 'dashboard';
+        // Get current hash or default to 'home'
+        const hash = window.location.hash.slice(1) || 'home';
 
         // Determine active route
         let activeRoute = '404';
         if (views[hash]) {
             activeRoute = hash;
         } else if (hash === '') {
-            activeRoute = 'dashboard';
+            activeRoute = 'home';
         }
 
         // 1. Update Views
@@ -34,7 +36,23 @@ document.addEventListener('DOMContentLoaded', () => {
             views[activeRoute].classList.remove('hidden');
         }
 
-        // 2. Update Active State (Desktop)
+        // 2. Toggle Navigation Visibility
+        // Hide top bar navigation if we are on the landing page
+        const topBarNav = document.querySelector('.top-bar .nav-links');
+        const brandName = document.querySelector('.brand-name');
+
+        if (activeRoute === 'home') {
+            if (topBarNav) topBarNav.style.display = 'none';
+            if (brandName) brandName.style.cursor = 'default';
+        } else {
+            if (topBarNav) topBarNav.style.display = 'flex';
+            if (brandName) {
+                brandName.style.cursor = 'pointer';
+                brandName.onclick = () => window.location.hash = '#home';
+            }
+        }
+
+        // 3. Update Active State (Desktop)
         navItems.forEach(item => {
             if (item.dataset.route === activeRoute) {
                 item.classList.add('active');
@@ -43,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 3. Update Active State (Mobile)
+        // 4. Update Active State (Mobile)
         mobileNavItems.forEach(item => {
             if (item.dataset.route === activeRoute) {
                 item.classList.add('active');
@@ -51,9 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.remove('active');
             }
         });
-
-        // 4. Update Header Title (Optional, if we want dynamic header text outside views)
-        // For now, each view has its own header.
     }
 
     // Listen for hash changes

@@ -53,133 +53,117 @@
         <!-- Main Workspace Area - Router View Container -->
         <main id="app-router" class="main-workspace">
 
+            <!-- View: Home (Landing Page) -->
+            <div id="view-home" class="view-section">
+                <section class="hero-section">
+                    <h1 class="hero-headline">Stop Missing The Right Jobs.</h1>
+                    <p class="hero-subtext">Precision-matched job discovery delivered daily at 9AM.</p>
+                    <a href="#settings" class="btn btn-primary" style="padding: 16px 32px; font-size: 18px;">Start
+                        Tracking</a>
+                </section>
+            </div>
+
             <!-- View: Dashboard -->
             <div id="view-dashboard" class="view-section hidden">
                 <section class="context-header">
                     <h1>Dashboard</h1>
-                    <p class="context-subtext">This section will be built in the next step.</p>
+                    <p class="context-subtext">Recent activity and job matches.</p>
                 </section>
+                <div class="empty-state">
+                    <h2>No jobs yet.</h2>
+                    <p>In the next step, you will load a realistic dataset.</p>
+                </div>
             </div>
 
             <!-- View: Saved -->
             <div id="view-saved" class="view-section hidden">
                 <section class="context-header">
                     <h1>Saved Jobs</h1>
-                    <p class="context-subtext">This section will be built in the next step.</p>
+                    <p class="context-subtext">Jobs you've flagged for later.</p>
                 </section>
+                <div class="empty-state">
+                    <h2>Your library is empty.</h2>
+                    <p>Saved jobs will appear here for easy access.</p>
+                </div>
             </div>
 
             <!-- View: Digest -->
             <div id="view-digest" class="view-section hidden">
                 <section class="context-header">
                     <h1>Daily Digest</h1>
-                    <p class="context-subtext">This section will be built in the next step.</p>
+                    <p class="context-subtext">Daily summary of top opportunities.</p>
                 </section>
+                <div class="empty-state">
+                    <h2>Nothing scheduled.</h2>
+                    <p>Set up your preferences to receive your daily 9AM digest.</p>
+                </div>
             </div>
 
             <!-- View: Settings -->
             <div id="view-settings" class="view-section hidden">
                 <section class="context-header">
                     <h1>Settings</h1>
-                    <p class="context-subtext">This section will be built in the next step.</p>
+                    <p class="context-subtext">Configure your tracking preferences.</p>
                 </section>
+
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="form-group">
+                            <label>Role Keywords</label>
+                            <input type="text" placeholder="e.g. Frontend Engineer, Product Designer">
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Locations</label>
+                            <input type="text" placeholder="e.g. San Francisco, London, Berlin">
+                        </div>
+                        <div class="form-group">
+                            <label>Mode</label>
+                            <select>
+                                <option value="remote">Remote</option>
+                                <option value="hybrid">Hybrid</option>
+                                <option value="onsite">Onsite</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Experience Level</label>
+                            <select>
+                                <option value="junior">Junior</option>
+                                <option value="mid">Mid-Level</option>
+                                <option value="senior">Senior</option>
+                                <option value="lead">Lead/Principal</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Save Preferences</button>
+                    </div>
+
+                    <aside class="secondary-panel">
+                        <div class="secondary-card">
+                            <h4 style="font-family: var(--font-serif); margin-bottom: 12px;">Pre-fill System</h4>
+                            <p style="font-size: 14px; color: var(--secondary-text);">Our engine uses these preferences
+                                to filter the incoming job stream. Precision is key to a quiet inbox.</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- View: Proof (Artifact Collection) -->
+            <div id="view-proof" class="view-section hidden">
+                <section class="context-header">
+                    <h1>Proof of Build</h1>
+                    <p class="context-subtext">Artifact collection and system verification.</p>
+                </section>
+                <div class="proof-placeholder">
+                    Artifacts for Step 3 will be displayed here.
+                </div>
             </div>
 
             <!-- View: 404 Not Found -->
             <div id="view-404" class="view-section hidden">
                 <section class="context-header">
                     <h1>404 • Page Not Found</h1>
-                    <p class="context-subtext">The page you are looking for does not exist. <a href="#dashboard"
-                            style="color: var(--accent-color);">Return to Dashboard</a></p>
+                    <p class="context-subtext">The page you are looking for does not exist. <a href="#home"
+                            style="color: var(--accent-color);">Return to Home</a></p>
                 </section>
-            </div>
-
-            <!-- View: Proof (Existing Design System) -->
-            <div id="view-proof" class="view-section">
-                <!-- 2. Context Header -->
-                <section class="context-header">
-                    <h1>Design System Setup</h1>
-                    <p class="context-subtext">Establishing the visual foundation and interaction rules.</p>
-                </section>
-
-                <div class="split-layout">
-                    <!-- 3. Primary Workspace (70%) -->
-                    <section class="primary-panel">
-                        <div class="card">
-                            <h3>Typography & Colors</h3>
-                            <p>This is the standard body text. It is set in Inter, 16px with 1.6 line-height. It is
-                                designed to be calm and legible.</p>
-
-                            <div style="margin-top: 24px;">
-                                <span
-                                    style="display:inline-block; width: 40px; height: 40px; background: #F7F6F3; border: 1px solid #ddd;"
-                                    title="#F7F6F3 Background"></span>
-                                <span style="display:inline-block; width: 40px; height: 40px; background: #111111;"
-                                    title="#111111 Text"></span>
-                                <span style="display:inline-block; width: 40px; height: 40px; background: #8B0000;"
-                                    title="#8B0000 Accent"></span>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <h3>Buttons & Inputs</h3>
-                            <div style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center;">
-                                <button class="btn btn-primary">Primary Action</button>
-                                <button class="btn btn-secondary">Secondary Action</button>
-                                <button class="btn btn-secondary btn-sm">Small Button</button>
-                            </div>
-
-                            <div style="max-width: 400px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Example
-                                    Input</label>
-                                <input type="text" placeholder="Type something calm..." />
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <h3>Layout Verification</h3>
-                            <p>The layout follows the 4-part structure: Top Bar, Context Header, Primary Workspace, and
-                                Secondary Panel.</p>
-                        </div>
-                    </section>
-
-                    <!-- 4. Secondary Panel (30%) -->
-                    <aside class="secondary-panel">
-                        <div class="secondary-card">
-                            <h4 style="font-family: var(--font-serif); margin-bottom: 12px;">Step Instructions</h4>
-                            <p style="font-size: 14px; margin-bottom: 16px;">Implement the KodNest Premium Build System
-                                design philosophy. Ensure all spacing is consistent and colors match the spec.</p>
-
-                            <div class="prompt-box">// Verify colors
-                                // Verify typography
-                                // Verify spacing</div>
-
-                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                <button class="btn btn-secondary btn-sm">Copy</button>
-                                <button class="btn btn-secondary btn-sm">Build in Lovable</button>
-                            </div>
-                        </div>
-
-                        <div class="secondary-card" style="border-left: 3px solid var(--accent-color);">
-                            <h4 style="font-family: var(--font-serif); margin-bottom: 8px;">Notes</h4>
-                            <p style="font-size: 14px; color: #555;">No gradients, no glassmorphism. Keep it calm.</p>
-                        </div>
-                    </aside>
-                </div>
-
-                <!-- 5. Proof Footer -->
-                <footer class="proof-footer">
-                    <div class="proof-checklist">
-                        <label class="checkbox-item"><input type="checkbox" checked> UI Built</label>
-                        <label class="checkbox-item"><input type="checkbox"> Logic Working</label>
-                        <label class="checkbox-item"><input type="checkbox"> Test Passed</label>
-                        <label class="checkbox-item"><input type="checkbox"> Deployed</label>
-                    </div>
-
-                    <div>
-                        <button class="btn btn-primary">Next Step &rarr;</button>
-                    </div>
-                </footer>
             </div>
 
         </main>
