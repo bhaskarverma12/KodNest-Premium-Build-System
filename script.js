@@ -77,18 +77,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Job Data & Rendering Logic ---
     let savedJobs = JSON.parse(localStorage.getItem('jobTracker_saved')) || [];
+    let preferences = JSON.parse(localStorage.getItem('jobTrackerPreferences')) || null;
 
     // DOM Elements
     const jobListEl = document.getElementById('job-list');
     const savedJobListEl = document.getElementById('saved-job-list');
 
-    // Filters
+    // Filters & Controls
     const filterSearch = document.getElementById('filter-search');
     const filterLocation = document.getElementById('filter-location');
     const filterMode = document.getElementById('filter-mode');
     const filterExperience = document.getElementById('filter-experience');
     const filterSource = document.getElementById('filter-source');
     const filterSort = document.getElementById('filter-sort');
+    const toggleMatchOnly = document.getElementById('toggle-match-only');
+    const bannerNoPrefs = document.getElementById('banner-no-prefs');
+
+    // Settings Form Elements
+    const prefRole = document.getElementById('pref-role');
+    const prefSkills = document.getElementById('pref-skills');
+    const prefLocation = document.getElementById('pref-location');
+    const prefExperience = document.getElementById('pref-experience');
+    const prefThreshold = document.getElementById('pref-threshold');
+    const ThresholdVal = document.getElementById('threshold-val');
+    const savePrefsBtn = document.getElementById('save-prefs-btn');
+    const saveMsg = document.getElementById('save-msg');
+
 
     // Modal Elements
     const modal = document.getElementById('job-modal');
@@ -101,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        loadPreferences();
+
         // Initial Render
         filterAndRenderJobs();
         renderSavedJobs(); // Initial functionality check
@@ -110,15 +126,151 @@ document.addEventListener('DOMContentLoaded', () => {
         filters.forEach(filter => {
             if (filter) filter.addEventListener('input', filterAndRenderJobs);
         });
+
+        if (toggleMatchOnly) {
+            toggleMatchOnly.addEventListener('change', filterAndRenderJobs);
+        }
+
+        // Setup Settings Listeners
+        if (prefThreshold) {
+            prefThreshold.addEventListener('input', (e) => {
+                if (ThresholdVal) ThresholdVal.textContent = e.target.value;
+            });
+        }
+
+        if (savePrefsBtn) {
+            savePrefsBtn.addEventListener('click', savePreferences);
+        }
+    }
+
+    function loadPreferences() {
+        if (!preferences) {
+            if (bannerNoPrefs) bannerNoPrefs.classList.remove('hidden');
+            return;
+        }
+
+        if (bannerNoPrefs) bannerNoPrefs.classList.add('hidden');
+
+        // Pre-fill form
+        if (prefRole) prefRole.value = preferences.roleKeywords.join(', ');
+        if (prefSkills) prefSkills.value = preferences.skills.join(', ');
+        if (prefExperience) prefExperience.value = preferences.experienceLevel;
+        if (prefThreshold) {
+            prefThreshold.value = preferences.minMatchScore;
+            if (ThresholdVal) ThresholdVal.textContent = preferences.minMatchScore;
+        }
+
+        // Multi-select Location
+        if (prefLocation) {
+            Array.from(prefLocation.options).forEach(opt => {
+                if (preferences.preferredLocations.includes(opt.value)) {
+                    opt.selected = true;
+                }
+            });
+        }
+
+        // Checkboxes Mode
+        if (preferences.preferredMode.includes('Remote')) document.getElementById('pref-mode-remote').checked = true;
+        if (preferences.preferredMode.includes('Hybrid')) document.getElementById('pref-mode-hybrid').checked = true;
+        if (preferences.preferredMode.includes('Onsite')) document.getElementById('pref-mode-onsite').checked = true;
+    }
+
+    function savePreferences() {
+        const roles = prefRole.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        const skills = prefSkills.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+        const locs = Array.from(prefLocation.selectedOptions).map(opt => opt.value);
+
+        const modes = [];
+        if (document.getElementById('pref-mode-remote').checked) modes.push('Remote');
+        if (document.getElementById('pref-mode-hybrid').checked) modes.push('Hybrid');
+        if (document.getElementById('pref-mode-onsite').checked) modes.push('Onsite');
+
+        const newPrefs = {
+            roleKeywords: roles,
+            skills: skills,
+            preferredLocations: locs,
+            preferredMode: modes,
+            experienceLevel: prefExperience.value,
+            minMatchScore: parseInt(prefThreshold.value)
+        };
+
+        localStorage.setItem('jobTrackerPreferences', JSON.stringify(newPrefs));
+        preferences = newPrefs;
+
+        // Update UI feedback
+        loadPreferences(); // Hide banner if present
+        if (saveMsg) {
+            saveMsg.style.opacity = '1';
+            setTimeout(() => { saveMsg.style.opacity = '0'; }, 3000);
+        }
+
+        // Re-calculate scores and render
+        filterAndRenderJobs();
+    }
+
+    function calculateMatchScore(job) {
+        if (!preferences) return 0;
+
+        let score = 0;
+
+        // 1. Role Keyword match (+25 Tile, +15 Desc)
+        const jobTitle = job.title.toLowerCase();
+        const jobDesc = job.description.toLowerCase();
+
+        const roleMatchesTitle = preferences.roleKeywords.some(k => jobTitle.includes(k.toLowerCase()));
+        if (roleMatchesTitle) score += 25;
+
+        const roleMatchesDesc = preferences.roleKeywords.some(k => jobDesc.includes(k.toLowerCase()));
+        if (roleMatchesDesc) score += 15;
+
+        // 2. Location (+15)
+        // Check if job location matches ANY preferred location
+        // Note: Job location might be specific ("Bangalore"), prefs might have ["Bangalore", "Remote"]
+        const locMatch = preferences.preferredLocations.some(l => job.location.includes(l));
+        if (locMatch) score += 15;
+
+        // 3. Mode (+10)
+        if (preferences.preferredMode.includes(job.mode)) score += 10;
+
+        // 4. Experience (+10)
+        if (preferences.experienceLevel === job.experience || preferences.experienceLevel === 'Any') score += 10;
+
+        // 5. Skills Overlap (+15)
+        const jobSkillsLower = job.skills.map(s => s.toLowerCase());
+        const prefSkillsLower = preferences.skills.map(s => s.toLowerCase());
+        const hasSkillOverlap = prefSkillsLower.some(s => jobSkillsLower.includes(s));
+        if (hasSkillOverlap) score += 15;
+
+        // 6. Recency (+5)
+        if (job.postedDaysAgo <= 2) score += 5;
+
+        // 7. Source (+5)
+        if (job.source === 'LinkedIn') score += 5;
+
+        return Math.min(score, 100);
+    }
+
+    function getMatchBadgeHTML(score) {
+        if (!preferences) return '';
+
+        let badgeClass = 'match-none';
+        if (score >= 80) badgeClass = 'match-high';
+        else if (score >= 60) badgeClass = 'match-medium';
+        else if (score >= 40) badgeClass = 'match-low';
+
+        return `<div class="match-badge ${badgeClass}">${score}% Match</div>`;
     }
 
     function createJobCard(job) {
         const isSaved = savedJobs.includes(job.id);
+        const matchBadge = getMatchBadgeHTML(job.matchScore || 0);
         const card = document.createElement('div');
         card.className = 'job-card';
 
         card.innerHTML = `
             <div class="job-card-header">
+                ${matchBadge}
                 <div class="job-title">${job.title}</div>
                 <div class="job-company">${job.company}</div>
             </div>
@@ -158,33 +310,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const exp = filterExperience.value;
         const src = filterSource.value;
         const sort = filterSort.value;
+        const showMatchesOnly = toggleMatchOnly ? toggleMatchOnly.checked : false;
 
-        let filtered = jobs.filter(job => {
+        // 1. Calculate Scores & Map
+        let processedJobs = jobs.map(job => {
+            return {
+                ...job,
+                matchScore: calculateMatchScore(job)
+            };
+        });
+
+        // 2. Filter
+        let filtered = processedJobs.filter(job => {
             const matchesSearch = job.title.toLowerCase().includes(searchTerm) ||
                 job.company.toLowerCase().includes(searchTerm) ||
                 job.skills.some(s => s.toLowerCase().includes(searchTerm));
-            const matchesLoc = loc === '' || job.location.includes(loc); // Loose match for multi-location
+            const matchesLoc = loc === '' || job.location.includes(loc);
             const matchesMode = mode === '' || job.mode === mode;
             const matchesExp = exp === '' || job.experience === exp;
             const matchesSrc = src === '' || job.source === src;
 
-            return matchesSearch && matchesLoc && matchesMode && matchesExp && matchesSrc;
+            // Match Threshold Filter
+            const matchesThreshold = !showMatchesOnly || (preferences && job.matchScore >= preferences.minMatchScore);
+
+            return matchesSearch && matchesLoc && matchesMode && matchesExp && matchesSrc && matchesThreshold;
         });
 
-        // Sort
+        // 3. Sort
         if (sort === 'latest') {
             filtered.sort((a, b) => a.postedDaysAgo - b.postedDaysAgo);
-        } else {
+        } else if (sort === 'oldest') {
             filtered.sort((a, b) => b.postedDaysAgo - a.postedDaysAgo);
+        } else if (sort === 'match') {
+            filtered.sort((a, b) => b.matchScore - a.matchScore);
+        } else if (sort === 'salary') {
+            // Simple sort based on first number found in string
+            filtered.sort((a, b) => {
+                const getSal = (s) => parseInt(s.replace(/[^0-9]/g, '')) || 0;
+                return getSal(b.salaryRange) - getSal(a.salaryRange);
+            });
         }
 
-        // Render
+        // 4. Render
         jobListEl.innerHTML = '';
         if (filtered.length === 0) {
             jobListEl.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1;">
                     <h2>No jobs found.</h2>
-                    <p>Try adjusting your search filters.</p>
+                    <p>Try adjusting your search filters or lowering your match threshold.</p>
                 </div>`;
         } else {
             filtered.forEach(job => {
