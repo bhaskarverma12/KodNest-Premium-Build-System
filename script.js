@@ -78,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Job Data & Rendering Logic ---
     let savedJobs = JSON.parse(localStorage.getItem('jobTracker_saved')) || [];
     let preferences = JSON.parse(localStorage.getItem('jobTrackerPreferences')) || null;
+    // Status Tracking Data
+    let jobStatuses = JSON.parse(localStorage.getItem('jobTrackerStatus')) || {};
+    let statusLog = JSON.parse(localStorage.getItem('jobTrackerStatusLog')) || [];
 
     // DOM Elements
     const jobListEl = document.getElementById('job-list');
@@ -90,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterExperience = document.getElementById('filter-experience');
     const filterSource = document.getElementById('filter-source');
     const filterSort = document.getElementById('filter-sort');
+    const filterStatus = document.getElementById('filter-status');
     const toggleMatchOnly = document.getElementById('toggle-match-only');
     const bannerNoPrefs = document.getElementById('banner-no-prefs');
 
@@ -122,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSavedJobs(); // Initial functionality check
 
         // Setup Filter Listeners
-        const filters = [filterSearch, filterLocation, filterMode, filterExperience, filterSource, filterSort];
+        const filters = [filterSearch, filterLocation, filterMode, filterExperience, filterSource, filterSort, filterStatus];
         filters.forEach(filter => {
             if (filter) filter.addEventListener('input', filterAndRenderJobs);
         });
@@ -268,12 +272,33 @@ document.addEventListener('DOMContentLoaded', () => {
     function createJobCard(job) {
         const isSaved = savedJobs.includes(job.id);
         const matchBadge = getMatchBadgeHTML(job.matchScore || 0);
+
+        // Status Handling
+        const currentStatus = jobStatuses[job.id] || 'Not Applied';
+        let statusBadgeClass = 'not-applied';
+        if (currentStatus === 'Applied') statusBadgeClass = 'applied';
+        if (currentStatus === 'Rejected') statusBadgeClass = 'rejected';
+        if (currentStatus === 'Selected') statusBadgeClass = 'selected';
+
+        const statusBadge = currentStatus !== 'Not Applied' ?
+            `<span class="status-badge ${statusBadgeClass}">${currentStatus}</span>` : '';
+
         const card = document.createElement('div');
         card.className = 'job-card';
 
+        // Status Button Group Generation
+        const statuses = ['Not Applied', 'Applied', 'Rejected', 'Selected'];
+        const statusButtonsHTML = statuses.map(s => {
+            const isActive = s === currentStatus ? 'active' : '';
+            return `<button class="status-btn ${isActive}" data-status="${s}" data-id="${job.id}">${s}</button>`;
+        }).join('');
+
         card.innerHTML = `
             <div class="job-card-header">
-                ${matchBadge}
+                <div style="display:flex; gap:8px;">
+                    ${matchBadge}
+                    ${statusBadge}
+                </div>
                 <div class="job-title">${job.title}</div>
                 <div class="job-company">${job.company}</div>
             </div>
@@ -294,6 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-primary btn-sm apply-btn" data-id="${job.id}">Apply</button>
                 </div>
             </div>
+            <!-- Status Control -->
+            <div class="status-btn-group">
+                ${statusButtonsHTML}
+            </div>
         `;
 
         // Add Listeners
@@ -301,7 +330,64 @@ document.addEventListener('DOMContentLoaded', () => {
         card.querySelector('.save-btn').addEventListener('click', (e) => toggleSave(job.id, e.target));
         card.querySelector('.apply-btn').addEventListener('click', () => window.open(job.applyUrl, '_blank'));
 
+        // Status Button Listeners
+        card.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const newStatus = e.target.dataset.status;
+                const jobId = parseInt(e.target.dataset.id);
+                updateJobStatus(jobId, newStatus, job);
+            });
+        });
+
         return card;
+    }
+
+    function updateJobStatus(jobId, newStatus, job) {
+        // 1. Update State
+        if (newStatus === 'Not Applied') {
+            delete jobStatuses[jobId];
+        } else {
+            jobStatuses[jobId] = newStatus;
+        }
+        localStorage.setItem('jobTrackerStatus', JSON.stringify(jobStatuses));
+
+        // 2. Log History
+        const logEntry = {
+            jobId: jobId,
+            title: job.title,
+            company: job.company,
+            status: newStatus,
+            date: new Date().toISOString()
+        };
+        statusLog.unshift(logEntry); // Add to beginning
+        if (statusLog.length > 50) statusLog.pop(); // Limit log size
+        localStorage.setItem('jobTrackerStatusLog', JSON.stringify(statusLog));
+
+        // 3. Notification
+        showToast(`Status updated: ${newStatus}`, newStatus === 'Selected' ? 'success' : 'info');
+
+        // 4. Re-render
+        // We re-render specifically to update the UI visuals without losing scroll position if possible,
+        // but for now full re-render is safer for consistency.
+        filterAndRenderJobs();
+        renderSavedJobs(); // In case we are in saved view
+    }
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<span>${message}</span>`;
+
+        container.appendChild(toast);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'toastSlideOut 0.3s ease-in forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     function filterAndRenderJobs() {
@@ -313,13 +399,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const exp = filterExperience.value;
         const src = filterSource.value;
         const sort = filterSort.value;
+        const statusFilter = filterStatus ? filterStatus.value : 'All';
         const showMatchesOnly = toggleMatchOnly ? toggleMatchOnly.checked : false;
 
         // 1. Calculate Scores & Map
         let processedJobs = jobs.map(job => {
             return {
                 ...job,
-                matchScore: calculateMatchScore(job)
+                matchScore: calculateMatchScore(job),
+                status: jobStatuses[job.id] || 'Not Applied'
             };
         });
 
@@ -333,10 +421,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchesExp = exp === '' || job.experience === exp;
             const matchesSrc = src === '' || job.source === src;
 
+            // Status Filter
+            const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
+
             // Match Threshold Filter
             const matchesThreshold = !showMatchesOnly || (preferences && job.matchScore >= preferences.minMatchScore);
 
-            return matchesSearch && matchesLoc && matchesMode && matchesExp && matchesSrc && matchesThreshold;
+            return matchesSearch && matchesLoc && matchesMode && matchesExp && matchesSrc && matchesThreshold && matchesStatus;
         });
 
         // 3. Sort
@@ -584,6 +675,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             digestJobList.appendChild(item);
+        });
+        renderDigestUpdates();
+    }
+
+    function renderDigestUpdates() {
+        const container = document.getElementById('digest-updates-list');
+        const section = document.getElementById('digest-updates-section');
+        if (!container || !section) return;
+
+        if (statusLog.length === 0) {
+            section.classList.add('hidden');
+            return;
+        }
+
+        section.classList.remove('hidden');
+        container.innerHTML = '';
+
+        // Show last 5 updates
+        statusLog.slice(0, 5).forEach(log => {
+            const date = new Date(log.date).toLocaleDateString();
+            const item = document.createElement('div');
+            item.className = 'digest-update-item';
+
+            let statusColor = '#666';
+            if (log.status === 'Applied') statusColor = '#1976D2';
+            if (log.status === 'Rejected') statusColor = '#D32F2F';
+            if (log.status === 'Selected') statusColor = '#388E3C';
+
+            item.innerHTML = `
+                <div>
+                    <strong>${log.title}</strong> at ${log.company}
+                </div>
+                <div>
+                    <span style="color:${statusColor}; font-weight:600;">${log.status}</span>
+                    <span style="font-size:0.8rem; color:#999; margin-left:8px;">${date}</span>
+                </div>
+            `;
+            container.appendChild(item);
         });
     }
 

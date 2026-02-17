@@ -130,6 +130,15 @@
                             <option value="salary">Highest Salary</option>
                         </select>
                     </div>
+                    <div class="filter-group">
+                        <select id="filter-status">
+                            <option value="All">All Status</option>
+                            <option value="Not Applied">Not Applied</option>
+                            <option value="Applied">Applied</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Selected">Selected</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- No Preferences Banner -->
@@ -203,124 +212,140 @@
                             <!-- Helper: Digest items rendered here -->
                         </div>
 
-                        <div class="digest-footer">
-                            <p>This digest was generated based on your preferences.</p>
-                            <a href="#settings" style="color: var(--accent-color); font-size: 12px;">Update
-                                Preferences</a>
+                    </div>
+
+                    <!-- Recent Status Updates (New Section) -->
+                    <div class="digest-updates-section hidden" id="digest-updates-section">
+                        <h3
+                            style="font-size: 1.2rem; margin-bottom: 16px; margin-top: 32px; border-top: 1px dashed var(--border-color); padding-top: 24px;">
+                            📝 Recent Status Updates</h3>
+                        <div id="digest-updates-list" class="digest-updates-list">
+                            <!-- Helper: Status updates rendered here -->
                         </div>
+                    </div>
+
+                    <div class="digest-footer">
+                        <p>This digest was generated based on your preferences.</p>
+                        <a href="#settings" style="color: var(--accent-color); font-size: 12px;">Update
+                            Preferences</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blocking State: No Preferences -->
+            <div id="digest-no-prefs" class="empty-state hidden">
+                <h2>Set Styles to Start</h2>
+                <p>We need to know your preferences to generate a personalized digest.</p>
+                <a href="#settings" class="btn btn-primary" style="margin-top: 16px;">Go to Settings</a>
+            </div>
+
+            <!-- Empty State: No Matches -->
+            <div id="digest-no-matches" class="empty-state hidden">
+                <h2>No matching roles today.</h2>
+                <p>Check again tomorrow or broaden your preferences.</p>
+            </div>
+    </div>
+
+    <!-- View: Settings -->
+    <div id="view-settings" class="view-section hidden">
+        <section class="context-header">
+            <h1>Settings</h1>
+            <p class="context-subtext">Configure your tracking preferences.</p>
+        </section>
+
+        <div class="settings-grid">
+            <div class="card">
+                <div class="form-group">
+                    <label>Role Keywords (comma separated)</label>
+                    <input type="text" id="pref-role" placeholder="e.g. Frontend, React, Product Designer">
+                </div>
+
+                <div class="form-group">
+                    <label>Skills (comma separated)</label>
+                    <input type="text" id="pref-skills" placeholder="e.g. Turnip, JavaScript, Python, AWS">
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Locations</label>
+                    <select id="pref-location" multiple style="height: 100px;">
+                        <option value="Bangalore">Bangalore</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Gurgaon">Gurgaon</option>
+                        <option value="Noida">Noida</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Remote">Remote</option>
+                    </select>
+                    <small style="color: var(--secondary-text); display: block; margin-top: 4px;">Hold Ctrl/Cmd
+                        to select multiple</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Mode</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="pref-mode-remote" value="Remote"> Remote</label>
+                        <label><input type="checkbox" id="pref-mode-hybrid" value="Hybrid"> Hybrid</label>
+                        <label><input type="checkbox" id="pref-mode-onsite" value="Onsite"> Onsite</label>
                     </div>
                 </div>
 
-                <!-- Blocking State: No Preferences -->
-                <div id="digest-no-prefs" class="empty-state hidden">
-                    <h2>Set Styles to Start</h2>
-                    <p>We need to know your preferences to generate a personalized digest.</p>
-                    <a href="#settings" class="btn btn-primary" style="margin-top: 16px;">Go to Settings</a>
+                <div class="form-group">
+                    <label>Experience Level</label>
+                    <select id="pref-experience">
+                        <option value="">Any</option>
+                        <option value="Fresher">Fresher</option>
+                        <option value="0-1">0-1 Years</option>
+                        <option value="1-3">1-3 Years</option>
+                    </select>
                 </div>
 
-                <!-- Empty State: No Matches -->
-                <div id="digest-no-matches" class="empty-state hidden">
-                    <h2>No matching roles today.</h2>
-                    <p>Check again tomorrow or broaden your preferences.</p>
+                <div class="form-group">
+                    <label>Minimum Match Score (<span id="threshold-val">40</span>%)</label>
+                    <input type="range" id="pref-threshold" min="0" max="100" value="40">
                 </div>
+
+                <button id="save-prefs-btn" class="btn btn-primary">Save Preferences</button>
+                <p id="save-msg"
+                    style="margin-top: 10px; color: var(--success-color); opacity: 0; transition: opacity 0.3s;">
+                    Preferences Saved!</p>
             </div>
 
-            <!-- View: Settings -->
-            <div id="view-settings" class="view-section hidden">
-                <section class="context-header">
-                    <h1>Settings</h1>
-                    <p class="context-subtext">Configure your tracking preferences.</p>
-                </section>
-
-                <div class="settings-grid">
-                    <div class="card">
-                        <div class="form-group">
-                            <label>Role Keywords (comma separated)</label>
-                            <input type="text" id="pref-role" placeholder="e.g. Frontend, React, Product Designer">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Skills (comma separated)</label>
-                            <input type="text" id="pref-skills" placeholder="e.g. Turnip, JavaScript, Python, AWS">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Preferred Locations</label>
-                            <select id="pref-location" multiple style="height: 100px;">
-                                <option value="Bangalore">Bangalore</option>
-                                <option value="Hyderabad">Hyderabad</option>
-                                <option value="Pune">Pune</option>
-                                <option value="Gurgaon">Gurgaon</option>
-                                <option value="Noida">Noida</option>
-                                <option value="Chennai">Chennai</option>
-                                <option value="Mumbai">Mumbai</option>
-                                <option value="Remote">Remote</option>
-                            </select>
-                            <small style="color: var(--secondary-text); display: block; margin-top: 4px;">Hold Ctrl/Cmd
-                                to select multiple</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Preferred Mode</label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" id="pref-mode-remote" value="Remote"> Remote</label>
-                                <label><input type="checkbox" id="pref-mode-hybrid" value="Hybrid"> Hybrid</label>
-                                <label><input type="checkbox" id="pref-mode-onsite" value="Onsite"> Onsite</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Experience Level</label>
-                            <select id="pref-experience">
-                                <option value="">Any</option>
-                                <option value="Fresher">Fresher</option>
-                                <option value="0-1">0-1 Years</option>
-                                <option value="1-3">1-3 Years</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Minimum Match Score (<span id="threshold-val">40</span>%)</label>
-                            <input type="range" id="pref-threshold" min="0" max="100" value="40">
-                        </div>
-
-                        <button id="save-prefs-btn" class="btn btn-primary">Save Preferences</button>
-                        <p id="save-msg"
-                            style="margin-top: 10px; color: var(--success-color); opacity: 0; transition: opacity 0.3s;">
-                            Preferences Saved!</p>
-                    </div>
-
-                    <aside class="secondary-panel">
-                        <div class="secondary-card">
-                            <h4 style="font-family: var(--font-serif); margin-bottom: 12px;">Pre-fill System</h4>
-                            <p style="font-size: 14px; color: var(--secondary-text);">Our engine uses these preferences
-                                to filter the incoming job stream. Precision is key to a quiet inbox.</p>
-                        </div>
-                    </aside>
+            <aside class="secondary-panel">
+                <div class="secondary-card">
+                    <h4 style="font-family: var(--font-serif); margin-bottom: 12px;">Pre-fill System</h4>
+                    <p style="font-size: 14px; color: var(--secondary-text);">Our engine uses these preferences
+                        to filter the incoming job stream. Precision is key to a quiet inbox.</p>
                 </div>
-            </div>
+            </aside>
+        </div>
+    </div>
 
-            <!-- View: Proof (Artifact Collection) -->
-            <div id="view-proof" class="view-section hidden">
-                <section class="context-header">
-                    <h1>Proof of Build</h1>
-                    <p class="context-subtext">Artifact collection and system verification.</p>
-                </section>
-                <div class="proof-placeholder">
-                    Artifacts for Step 3 will be displayed here.
-                </div>
-            </div>
+    <!-- View: Proof (Artifact Collection) -->
+    <div id="view-proof" class="view-section hidden">
+        <section class="context-header">
+            <h1>Proof of Build</h1>
+            <p class="context-subtext">Artifact collection and system verification.</p>
+        </section>
+        <div class="proof-placeholder">
+            Artifacts for Step 3 will be displayed here.
+        </div>
+    </div>
 
-            <!-- View: 404 Not Found -->
-            <div id="view-404" class="view-section hidden">
-                <section class="context-header">
-                    <h1>404 • Page Not Found</h1>
-                    <p class="context-subtext">The page you are looking for does not exist. <a href="#home"
-                            style="color: var(--accent-color);">Return to Home</a></p>
-                </section>
-            </div>
+    <!-- View: 404 Not Found -->
+    <div id="view-404" class="view-section hidden">
+        <section class="context-header">
+            <h1>404 • Page Not Found</h1>
+            <p class="context-subtext">The page you are looking for does not exist. <a href="#home"
+                    style="color: var(--accent-color);">Return to Home</a></p>
+        </section>
+    </div>
 
-        </main>
+    </main>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
     </div>
 
     <!-- Job Details Modal -->
