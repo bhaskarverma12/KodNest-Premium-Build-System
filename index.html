@@ -165,9 +165,63 @@
                     <h1>Daily Digest</h1>
                     <p class="context-subtext">Daily summary of top opportunities.</p>
                 </section>
-                <div class="empty-state">
-                    <h2>Nothing scheduled.</h2>
-                    <p>Set up your preferences to receive your daily 9AM digest.</p>
+                <!-- Digest Generator (Initial State) -->
+                <div id="digest-generator" class="empty-state">
+                    <div class="digest-icon-wrapper" style="font-size: 48px; margin-bottom: 16px;">📩</div>
+                    <h2>Your 9AM Briefing</h2>
+                    <p>Generate a curated list of the top 10 jobs matching your profile for today.</p>
+                    <button id="btn-generate-digest" class="btn btn-primary" style="margin-top: 24px;">
+                        Generate Today's Digest (Simulated)
+                    </button>
+                    <p class="demo-note" style="margin-top: 16px; font-size: 12px; color: #999;">
+                        Demo Mode: Daily 9AM trigger can be simulated manually.
+                    </p>
+                </div>
+
+                <!-- Digest Content (Hidden until generated) -->
+                <div id="digest-content" class="digest-wrapper hidden">
+
+                    <!-- Digest Header -->
+                    <div class="digest-header">
+                        <h1>Top 10 Jobs For You — 9AM Digest</h1>
+                        <p class="digest-date" id="digest-date-display">February 16, 2026</p>
+                    </div>
+
+                    <!-- Digest Actions -->
+                    <div class="digest-actions-bar">
+                        <button id="btn-copy-digest" class="btn btn-secondary btn-sm">
+                            📋 Copy to Clipboard
+                        </button>
+                        <button id="btn-email-digest" class="btn btn-secondary btn-sm">
+                            ✉️ Create Email Draft
+                        </button>
+                    </div>
+
+                    <!-- The Digest Card (Email Style) -->
+                    <div class="digest-card">
+                        <div id="digest-job-list" class="digest-list">
+                            <!-- Helper: Digest items rendered here -->
+                        </div>
+
+                        <div class="digest-footer">
+                            <p>This digest was generated based on your preferences.</p>
+                            <a href="#settings" style="color: var(--accent-color); font-size: 12px;">Update
+                                Preferences</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blocking State: No Preferences -->
+                <div id="digest-no-prefs" class="empty-state hidden">
+                    <h2>Set Styles to Start</h2>
+                    <p>We need to know your preferences to generate a personalized digest.</p>
+                    <a href="#settings" class="btn btn-primary" style="margin-top: 16px;">Go to Settings</a>
+                </div>
+
+                <!-- Empty State: No Matches -->
+                <div id="digest-no-matches" class="empty-state hidden">
+                    <h2>No matching roles today.</h2>
+                    <p>Check again tomorrow or broaden your preferences.</p>
                 </div>
             </div>
 

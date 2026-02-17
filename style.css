@@ -947,3 +947,137 @@ select:focus {
 .hidden {
   display: none;
 }
+
+/* --- Daily Digest Styles --- */
+.digest-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.digest-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.digest-header h1 {
+  font-size: 2rem;
+  color: var(--text-color);
+  margin-bottom: 4px;
+}
+
+.digest-date {
+  color: var(--secondary-text);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.digest-actions-bar {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.digest-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-xl);
+}
+
+.digest-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.digest-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.digest-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.digest-item-content {
+  flex: 1;
+}
+
+.digest-job-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 4px;
+  font-family: var(--font-serif);
+}
+
+.digest-job-company {
+  font-size: 1rem;
+  color: var(--secondary-text);
+  margin-bottom: 8px;
+}
+
+.digest-job-meta {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  display: flex;
+  gap: 12px;
+}
+
+.digest-item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.digest-match-score {
+  font-weight: 700;
+  color: var(--success-color);
+  font-size: 0.9rem;
+}
+
+.digest-footer {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px dashed var(--border-color);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+.digest-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  background: #F5F5F5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

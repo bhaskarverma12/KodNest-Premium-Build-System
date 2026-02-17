@@ -138,9 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+
         if (savePrefsBtn) {
             savePrefsBtn.addEventListener('click', savePreferences);
         }
+
+        initDigest(); // Initialize Digest Logic
     }
 
     function loadPreferences() {
@@ -462,6 +465,167 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial call
     router();
     initJobs();
+
+
+    // --- Daily Digest Logic ---
+    const digestGenerator = document.getElementById('digest-generator');
+    const digestContent = document.getElementById('digest-content');
+    const digestNoPrefs = document.getElementById('digest-no-prefs');
+    const digestNoMatches = document.getElementById('digest-no-matches');
+    const btnGenerateDigest = document.getElementById('btn-generate-digest');
+    const btnCopyDigest = document.getElementById('btn-copy-digest');
+    const btnEmailDigest = document.getElementById('btn-email-digest');
+    const digestDateDisplay = document.getElementById('digest-date-display');
+    const digestJobList = document.getElementById('digest-job-list');
+
+    function initDigest() {
+        if (!preferences) {
+            showDigestState('no-prefs');
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        const savedDigest = localStorage.getItem(`jobTrackerDigest_${today}`);
+
+        if (savedDigest) {
+            const digestData = JSON.parse(savedDigest);
+            renderDigest(digestData);
+            showDigestState('content');
+        } else {
+            showDigestState('generator');
+        }
+
+        setupDigestListeners();
+    }
+
+    function setupDigestListeners() {
+        if (btnGenerateDigest) btnGenerateDigest.onclick = generateDigest;
+        if (btnCopyDigest) btnCopyDigest.onclick = handleCopyDigest;
+        if (btnEmailDigest) btnEmailDigest.onclick = handleEmailDigest;
+    }
+
+    function showDigestState(state) {
+        if (digestGenerator) digestGenerator.classList.add('hidden');
+        if (digestContent) digestContent.classList.add('hidden');
+        if (digestNoPrefs) digestNoPrefs.classList.add('hidden');
+        if (digestNoMatches) digestNoMatches.classList.add('hidden');
+
+        if (state === 'generator' && digestGenerator) digestGenerator.classList.remove('hidden');
+        if (state === 'content' && digestContent) digestContent.classList.remove('hidden');
+        if (state === 'no-prefs' && digestNoPrefs) digestNoPrefs.classList.remove('hidden');
+        if (state === 'no-matches' && digestNoMatches) digestNoMatches.classList.remove('hidden');
+    }
+
+    function generateDigest() {
+        if (!preferences) return;
+
+        // 1. Calculate Scores
+        let processedJobs = jobs.map(job => ({
+            ...job,
+            matchScore: calculateMatchScore(job)
+        }));
+
+        // 2. Filter & Sort
+        // Logic: Must match prefs (min score), sorted by Score DESC, then Date NEWEST
+        let qualifiedJobs = processedJobs.filter(job => job.matchScore >= preferences.minMatchScore);
+
+        qualifiedJobs.sort((a, b) => {
+            if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+            return a.postedDaysAgo - b.postedDaysAgo; // Lower days ago is newer
+        });
+
+        // 3. Take Top 10
+        const top10 = qualifiedJobs.slice(0, 10);
+
+        if (top10.length === 0) {
+            showDigestState('no-matches');
+            return;
+        }
+
+        // 4. Persist
+        const today = new Date().toISOString().split('T')[0];
+        const digestData = {
+            date: today,
+            jobs: top10
+        };
+        localStorage.setItem(`jobTrackerDigest_${today}`, JSON.stringify(digestData));
+
+        // 5. Render
+        renderDigest(digestData);
+        showDigestState('content');
+    }
+
+    function renderDigest(digestData) {
+        if (!digestJobList || !digestDateDisplay) return;
+
+        // Format Date
+        const dateObj = new Date(digestData.date);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        digestDateDisplay.textContent = dateObj.toLocaleDateString('en-US', options);
+
+        digestJobList.innerHTML = '';
+
+        digestData.jobs.forEach(job => {
+            const item = document.createElement('div');
+            item.className = 'digest-item';
+            item.innerHTML = `
+                <div class="digest-item-content">
+                    <div class="digest-job-title">${job.title}</div>
+                    <div class="digest-job-company">${job.company}</div>
+                    <div class="digest-job-meta">
+                        <span>📍 ${job.location}</span>
+                        <span>💼 ${job.experience}</span>
+                        <span>💰 ${job.salaryRange}</span>
+                    </div>
+                </div>
+                <div class="digest-item-actions">
+                    <span class="digest-match-score">${job.matchScore}% Match</span>
+                    <a href="${job.applyUrl}" target="_blank" class="btn btn-primary btn-sm" style="padding: 4px 12px; font-size: 12px;">Apply</a>
+                </div>
+            `;
+            digestJobList.appendChild(item);
+        });
+    }
+
+    function handleCopyDigest() {
+        const today = new Date().toISOString().split('T')[0];
+        const savedDigest = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`));
+        if (!savedDigest) return;
+
+        let text = `📅 Job Digest - ${savedDigest.date}\n\n`;
+        savedDigest.jobs.forEach((job, index) => {
+            text += `${index + 1}. ${job.title} at ${job.company}\n`;
+            text += `   📍 ${job.location} | Match: ${job.matchScore}%\n`;
+            text += `   🔗 Apply: ${job.applyUrl}\n\n`;
+        });
+        text += `Generated by Job Notification Tracker`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            if (btnCopyDigest) {
+                const originalText = btnCopyDigest.textContent;
+                btnCopyDigest.textContent = "✅ Copied!";
+                setTimeout(() => btnCopyDigest.textContent = originalText, 2000);
+            }
+        });
+    }
+
+    function handleEmailDigest() {
+        const today = new Date().toISOString().split('T')[0];
+        const savedDigest = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`));
+        if (!savedDigest) return;
+
+        const subject = encodeURIComponent(`My 9AM Job Digest - ${savedDigest.date}`);
+        let body = `Here are your top job matches for today:\n\n`;
+
+        savedDigest.jobs.forEach((job, index) => {
+            body += `${index + 1}. ${job.title} at ${job.company}\n`;
+            body += `Location: ${job.location}\n`;
+            body += `Match Score: ${job.matchScore}%\n`;
+            body += `Link: ${job.applyUrl}\n\n`;
+        });
+
+        window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+    }
 
 
     // --- Mobile Menu Logic ---
